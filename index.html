@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pterozyy — Node Script</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#e3e8ef; --ink:#2b3445; --muted:#667085;
+  --hi:#ffffff; --lo:#b8c0cf;
+  --accent:#5b6cff; --ok:#14a36b;
+  --code-ink:#2b3445; --code-dim:#8a94a6;
+  --sans:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --raised:9px 9px 18px var(--lo),-9px -9px 18px var(--hi);
+  --raised-sm:5px 5px 10px var(--lo),-5px -5px 10px var(--hi);
+  --inset:inset 6px 6px 12px var(--lo),inset -6px -6px 12px var(--hi);
+  --inset-sm:inset 3px 3px 6px var(--lo),inset -3px -3px 6px var(--hi);
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#262b36; --ink:#e4e8f0; --muted:#9aa3b5; --hi:#303644; --lo:#1c2029;
+    --accent:#8b97ff; --ok:#3ddc97; --code-ink:#e4e8f0; --code-dim:#7c869a}
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:500 16px/1.55 var(--sans);
+  padding:calc(28px + env(safe-area-inset-top,0px)) 18px calc(40px + env(safe-area-inset-bottom,0px))}
+main{max-width:860px;margin:0 auto;display:grid;gap:28px}
+
+.card{background:var(--bg);border-radius:28px;box-shadow:var(--raised);padding:26px}
+.hero{display:flex;gap:20px;align-items:center}
+.logo{flex:none;width:72px;height:72px;border-radius:22px;box-shadow:var(--inset);display:grid;place-items:center;
+  font:800 1.6rem var(--sans);color:var(--accent)}
+h1{margin:0;font:800 clamp(1.7rem,6vw,2.6rem)/1.1 var(--sans);letter-spacing:-.02em}
+.sub{margin:6px 0 0;color:var(--muted)}
+h2{margin:0 0 14px;font:700 1.1rem var(--sans)}
+
+.cmd{display:flex;gap:14px;align-items:center}
+.cmd code{flex:1;min-width:0;overflow-x:auto;white-space:nowrap;border-radius:16px;box-shadow:var(--inset);
+  padding:16px 18px;font:700 .88rem/1 var(--mono);color:var(--accent)}
+
+button{font:700 .92rem var(--sans);cursor:pointer;color:var(--ink);background:var(--bg);border:0;
+  border-radius:16px;padding:0 20px;min-height:48px;box-shadow:var(--raised-sm);
+  transition:box-shadow .15s,color .15s}
+button:hover{color:var(--accent)}
+button:active{box-shadow:var(--inset-sm)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+button:disabled{opacity:.5;cursor:not-allowed;box-shadow:var(--raised-sm);color:var(--muted)}
+button.done{box-shadow:var(--inset-sm);color:var(--ok)}
+
+.bar{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;margin-bottom:10px}
+.actions{display:flex;flex-wrap:wrap;gap:12px}
+.meta{display:inline-block;margin:0 0 16px;padding:4px 14px;border-radius:999px;box-shadow:var(--inset-sm);
+  font:400 .8rem var(--mono);color:var(--muted)}
+
+.viewer{border-radius:20px;box-shadow:var(--inset);overflow:hidden;padding:8px}
+.scroll{max-height:68vh;overflow:auto;border-radius:14px}
+pre{margin:0;padding:10px 0;font:400 .84rem/1.7 var(--mono);color:var(--code-ink);min-width:max-content}
+.ln{display:grid;grid-template-columns:3.4rem 1fr}
+.ln span:first-child{color:var(--code-dim);text-align:right;padding-right:16px;user-select:none}
+.ln span:last-child{white-space:pre;padding-right:18px}
+.ln.cm span:last-child{color:var(--code-dim)}
+.state{padding:28px 20px;font-size:.95rem}
+.state b{color:#d6455d}
+.state code{font-family:var(--mono);padding:2px 8px;border-radius:8px;box-shadow:var(--inset-sm);color:var(--accent)}
+
+.warn{display:flex;gap:14px;align-items:center;color:var(--muted);font-size:.9rem}
+.warn i{flex:none;width:36px;height:36px;border-radius:50%;box-shadow:var(--inset-sm);display:grid;place-items:center;
+  font:800 1rem var(--sans);font-style:normal;color:#d6455d}
+
+@media (max-width:560px){
+  .card{padding:20px;border-radius:24px}
+  .cmd{flex-direction:column;align-items:stretch}
+  .cmd code{width:100%}
+  .hero{flex-direction:column;align-items:flex-start}
+}
+@media (prefers-reduced-motion:reduce){button{transition:none}}
+</style>
+</head>
+<body>
+<main>
+  <section class="card hero">
+    <div class="logo" aria-hidden="true">Pz</div>
+    <div>
+      <h1>Pterozyy Node</h1>
+      <p class="sub">Script untuk membuat node. Baca isinya dulu, baru jalankan di server kamu.</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Perintah install</h2>
+    <div class="cmd">
+      <code id="cmd">bash &lt;(curl -s https://kruzzy.biz.id/node.sh)</code>
+      <button id="copyCmd" type="button">Salin</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="bar">
+      <h2 style="margin:0">Isi node.sh</h2>
+      <div class="actions">
+        <button id="reload" type="button">Muat ulang</button>
+        <button id="copyScript" type="button" disabled>Salin script</button>
+        <button id="download" type="button" disabled>Unduh</button>
+      </div>
+    </div>
+    <span class="meta" id="meta">Memuat…</span>
+    <div class="viewer"><div class="scroll" id="out"><div class="state">Memuat node.sh…</div></div></div>
+  </section>
+
+  <div class="warn"><i aria-hidden="true">!</i><span>Selalu baca script sebelum menjalankannya, terutama dengan akses root.</span></div>
+</main>
+
+<script>
+(function(){
+  var FILE = "node.sh";
+  var out = document.getElementById("out");
+  var meta = document.getElementById("meta");
+  var copyScript = document.getElementById("copyScript");
+  var download = document.getElementById("download");
+  var text = "";
+
+  function flash(btn, label){
+    var old = btn.textContent;
+    btn.textContent = label; btn.classList.add("done");
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove("done"); }, 1400);
+  }
+  function copy(str, btn){
+    function ok(){ flash(btn, "Tersalin"); }
+    function fallback(){
+      var t = document.createElement("textarea");
+      t.value = str; document.body.appendChild(t); t.select();
+      try { document.execCommand("copy"); ok(); } catch(e){}
+      document.body.removeChild(t);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(str).then(ok, fallback);
+    } else { fallback(); }
+  }
+  function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  function render(src){
+    var lines = src.replace(/\r\n/g,"\n").split("\n");
+    if (lines.length && lines[lines.length-1] === "") lines.pop();
+    var html = lines.map(function(l,i){
+      var cm = /^\s*#/.test(l) ? " cm" : "";
+      return '<div class="ln'+cm+'"><span>'+(i+1)+'</span><span>'+esc(l)+'</span></div>';
+    }).join("");
+    out.innerHTML = "<pre>"+html+"</pre>";
+    meta.textContent = FILE + " · " + lines.length + " baris · " + new Blob([src]).size + " byte";
+  }
+
+  function fail(msg){
+    out.innerHTML = '<div class="state"><b>Gagal memuat.</b> ' + esc(msg) +
+      '<br><br>Pastikan file <code>' + FILE + '</code> ada di folder yang sama dengan <code>index.html</code>.</div>';
+    meta.textContent = "Tidak ada data";
+    copyScript.disabled = download.disabled = true;
+  }
+
+  function load(){
+    meta.textContent = "Memuat…";
+    out.innerHTML = '<div class="state">Memuat ' + FILE + '…</div>';
+    fetch(FILE + "?t=" + Date.now(), {cache:"no-store"}).then(function(r){
+      if (!r.ok) throw new Error("Server membalas " + r.status + ".");
+      return r.text();
+    }).then(function(src){
+      var head = src.trim().slice(0,15).toLowerCase();
+      if (head.indexOf("<!doctype") === 0 || head.indexOf("<html") === 0)
+        throw new Error("File yang diterima berupa halaman HTML, bukan script.");
+      if (!src.trim()) throw new Error("File kosong.");
+      text = src; render(src);
+      copyScript.disabled = download.disabled = false;
+    }).catch(function(e){ fail(e.message || "Terjadi kesalahan."); });
+  }
+
+  document.getElementById("copyCmd").onclick = function(){
+    copy(document.getElementById("cmd").textContent, this);
+  };
+  copyScript.onclick = function(){ copy(text, this); };
+  download.onclick = function(){
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([text],{type:"text/x-shellscript"}));
+    a.download = FILE; document.body.appendChild(a); a.click(); a.remove();
+  };
+  document.getElementById("reload").onclick = load;
+  load();
+})();
+</script>
+</body>
+</html>
