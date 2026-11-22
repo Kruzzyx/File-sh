@@ -3,15 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Pterozyy — Node Script</title>
+<title>Kruzzy Node</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#e3e8ef; --ink:#2b3445; --muted:#667085;
-  --hi:#ffffff; --lo:#b8c0cf;
-  --accent:#5b6cff; --ok:#14a36b;
-  --code-ink:#2b3445; --code-dim:#8a94a6;
+  --bg:#e3e8ef; --ink:#2b3445; --muted:#667085; --hi:#fff; --lo:#b8c0cf;
+  --accent:#5b6cff; --ok:#14a36b; --warn:#d6455d;
   --sans:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
   --raised:9px 9px 18px var(--lo),-9px -9px 18px var(--hi);
@@ -20,172 +18,256 @@
   --inset-sm:inset 3px 3px 6px var(--lo),inset -3px -3px 6px var(--hi);
 }
 @media (prefers-color-scheme:dark){
-  :root{--bg:#262b36; --ink:#e4e8f0; --muted:#9aa3b5; --hi:#303644; --lo:#1c2029;
-    --accent:#8b97ff; --ok:#3ddc97; --code-ink:#e4e8f0; --code-dim:#7c869a}
+  :root{--bg:#262b36;--ink:#e4e8f0;--muted:#9aa3b5;--hi:#303644;--lo:#1c2029;--accent:#8b97ff;--ok:#3ddc97;--warn:#ff7b8f}
 }
 *{box-sizing:border-box}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--ink);font:500 16px/1.55 var(--sans);
   padding:calc(28px + env(safe-area-inset-top,0px)) 18px calc(40px + env(safe-area-inset-bottom,0px))}
 main{max-width:860px;margin:0 auto;display:grid;gap:28px}
-
 .card{background:var(--bg);border-radius:28px;box-shadow:var(--raised);padding:26px}
+h1{margin:0;font:800 clamp(1.7rem,6vw,2.6rem)/1.1 var(--sans);letter-spacing:-.02em}
+h2{margin:0 0 14px;font:700 1.1rem var(--sans)}
+.sub{margin:6px 0 0;color:var(--muted)}
+
+/* hero */
 .hero{display:flex;gap:20px;align-items:center}
 .logo{flex:none;width:72px;height:72px;border-radius:22px;box-shadow:var(--inset);display:grid;place-items:center;
-  font:800 1.6rem var(--sans);color:var(--accent)}
-h1{margin:0;font:800 clamp(1.7rem,6vw,2.6rem)/1.1 var(--sans);letter-spacing:-.02em}
-.sub{margin:6px 0 0;color:var(--muted)}
-h2{margin:0 0 14px;font:700 1.1rem var(--sans)}
+  font:800 1.6rem var(--sans);color:var(--accent);animation:float 4s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-3px)}}
+.status{display:inline-flex;align-items:center;gap:8px;margin-top:12px;padding:4px 14px;border-radius:999px;
+  box-shadow:var(--inset-sm);font:400 .8rem var(--mono);color:var(--muted)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.status.ok .dot{background:var(--ok);animation:pulse 1.8s infinite}
+.status.bad .dot{background:var(--warn)}
+@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--ok) 60%,transparent)}100%{box-shadow:0 0 0 9px transparent}}
 
+/* command */
 .cmd{display:flex;gap:14px;align-items:center}
 .cmd code{flex:1;min-width:0;overflow-x:auto;white-space:nowrap;border-radius:16px;box-shadow:var(--inset);
   padding:16px 18px;font:700 .88rem/1 var(--mono);color:var(--accent)}
-
-button{font:700 .92rem var(--sans);cursor:pointer;color:var(--ink);background:var(--bg);border:0;
-  border-radius:16px;padding:0 20px;min-height:48px;box-shadow:var(--raised-sm);
-  transition:box-shadow .15s,color .15s}
+button{font:700 .92rem var(--sans);cursor:pointer;color:var(--ink);background:var(--bg);border:0;border-radius:16px;
+  padding:0 20px;min-height:48px;box-shadow:var(--raised-sm);transition:box-shadow .15s,color .15s,transform .15s}
 button:hover{color:var(--accent)}
-button:active{box-shadow:var(--inset-sm)}
-button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
-button:disabled{opacity:.5;cursor:not-allowed;box-shadow:var(--raised-sm);color:var(--muted)}
+button:active{box-shadow:var(--inset-sm);transform:scale(.97)}
+button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 button.done{box-shadow:var(--inset-sm);color:var(--ok)}
+button.done span{display:inline-block;animation:pop .3s}
+@keyframes pop{0%{transform:scale(.6)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
 
-.bar{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;margin-bottom:10px}
-.actions{display:flex;flex-wrap:wrap;gap:12px}
-.meta{display:inline-block;margin:0 0 16px;padding:4px 14px;border-radius:999px;box-shadow:var(--inset-sm);
-  font:400 .8rem var(--mono);color:var(--muted)}
+/* filter */
+.chips{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:22px}
+.chip{min-height:40px;padding:0 18px;font-size:.85rem}
+.chip[aria-pressed=true]{box-shadow:var(--inset-sm);color:var(--accent)}
 
-.viewer{border-radius:20px;box-shadow:var(--inset);overflow:hidden;padding:8px}
-.scroll{max-height:68vh;overflow:auto;border-radius:14px}
-pre{margin:0;padding:10px 0;font:400 .84rem/1.7 var(--mono);color:var(--code-ink);min-width:max-content}
-.ln{display:grid;grid-template-columns:3.4rem 1fr}
-.ln span:first-child{color:var(--code-dim);text-align:right;padding-right:16px;user-select:none}
-.ln span:last-child{white-space:pre;padding-right:18px}
-.ln.cm span:last-child{color:var(--code-dim)}
-.state{padding:28px 20px;font-size:.95rem}
-.state b{color:#d6455d}
-.state code{font-family:var(--mono);padding:2px 8px;border-radius:8px;box-shadow:var(--inset-sm);color:var(--accent)}
+/* steps */
+.grid{display:grid;gap:18px}
+.step{border-radius:22px;box-shadow:var(--raised-sm);padding:0;transition:box-shadow .2s,transform .2s}
+.step:hover{transform:translateY(-2px)}
+.step[open]{box-shadow:var(--inset)}
+.step.in{animation:rise .5s both}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:16px;padding:18px 20px;border-radius:22px}
+summary::-webkit-details-marker{display:none}
+.num{flex:none;width:42px;height:42px;border-radius:14px;box-shadow:var(--inset-sm);display:grid;place-items:center;
+  font:700 .95rem var(--mono);color:var(--accent)}
+.txt{flex:1;min-width:0}
+.txt b{display:block;font-size:1.02rem}
+.txt small{color:var(--muted);font-size:.88rem}
+.tag{flex:none;font:700 .72rem var(--sans);padding:3px 12px;border-radius:999px;box-shadow:var(--inset-sm);color:var(--muted)}
+.tag.Hati-hati{color:var(--warn)}
+.chev{flex:none;width:10px;height:10px;border-right:2.5px solid var(--muted);border-bottom:2.5px solid var(--muted);
+  transform:rotate(45deg);transition:transform .25s;margin:0 4px 4px 4px}
+.step[open] .chev{transform:rotate(225deg) translate(-3px,-3px)}
+.body{padding:0 22px 20px 78px;color:var(--muted);font-size:.92rem;animation:fade .3s}
+@keyframes fade{from{opacity:0;transform:translateY(-4px)}}
+.body ul{margin:0;padding-left:18px;display:grid;gap:6px}
+.body code{font:400 .82rem var(--mono);color:var(--accent)}
+
+/* info */
+.info{display:grid;gap:22px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.info h3{margin:0 0 10px;font:700 .95rem var(--sans)}
+.info ul{margin:0;padding-left:18px;color:var(--muted);font-size:.9rem;display:grid;gap:6px}
+.tags{display:flex;flex-wrap:wrap;gap:8px}
+.tags span{padding:4px 12px;border-radius:12px;box-shadow:var(--inset-sm);font:400 .78rem var(--mono);color:var(--muted)}
 
 .warn{display:flex;gap:14px;align-items:center;color:var(--muted);font-size:.9rem}
 .warn i{flex:none;width:36px;height:36px;border-radius:50%;box-shadow:var(--inset-sm);display:grid;place-items:center;
-  font:800 1rem var(--sans);font-style:normal;color:#d6455d}
+  font:800 1rem var(--sans);font-style:normal;color:var(--warn)}
+
+/* skeleton */
+.sk{border-radius:12px;box-shadow:var(--inset-sm);position:relative;overflow:hidden}
+.sk::after{content:"";position:absolute;inset:0;transform:translateX(-100%);
+  background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--hi) 85%,transparent),transparent);animation:shimmer 1.4s infinite}
+@keyframes shimmer{to{transform:translateX(100%)}}
+.sk-row{display:flex;align-items:center;gap:16px;padding:18px 20px;border-radius:22px;box-shadow:var(--raised-sm)}
+.sk-row .a{width:42px;height:42px;border-radius:14px;flex:none}
+.sk-row .b{flex:1;display:grid;gap:8px}
+.sk-row .b i{height:12px;display:block}
+.sk-row .b i:last-child{width:60%}
+.sk-cmd{height:48px;flex:1}
 
 @media (max-width:560px){
   .card{padding:20px;border-radius:24px}
   .cmd{flex-direction:column;align-items:stretch}
-  .cmd code{width:100%}
   .hero{flex-direction:column;align-items:flex-start}
+  .body{padding-left:22px}
+  .tag{display:none}
 }
-@media (prefers-reduced-motion:reduce){button{transition:none}}
+@media (prefers-reduced-motion:reduce){*,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 <main>
   <section class="card hero">
-    <div class="logo" aria-hidden="true">Pz</div>
+    <div class="logo" aria-hidden="true">Kz</div>
     <div>
-      <h1>Pterozyy Node</h1>
-      <p class="sub">Script untuk membuat node. Baca isinya dulu, baru jalankan di server kamu.</p>
+      <h1>Kruzzy Node</h1>
+      <p class="sub">Satu perintah untuk menyiapkan node, allocation, egg, Wings, dan server di panel Pterodactyl.</p>
+      <span class="status" id="status" aria-live="polite"><span class="dot"></span><span id="stxt">Memeriksa script…</span></span>
     </div>
   </section>
 
   <section class="card">
     <h2>Perintah install</h2>
-    <div class="cmd">
-      <code id="cmd">bash &lt;(curl -s https://kruzzy.biz.id/node.sh)</code>
-      <button id="copyCmd" type="button">Salin</button>
+    <div class="cmd" id="cmdWrap">
+      <div class="sk sk-cmd"></div><div class="sk" style="width:96px;height:48px;border-radius:16px"></div>
     </div>
   </section>
 
   <section class="card">
-    <div class="bar">
-      <h2 style="margin:0">Isi node.sh</h2>
-      <div class="actions">
-        <button id="reload" type="button">Muat ulang</button>
-        <button id="copyScript" type="button" disabled>Salin script</button>
-        <button id="download" type="button" disabled>Unduh</button>
-      </div>
+    <h2>Apa yang dilakukan script</h2>
+    <div class="chips" id="chips" role="group" aria-label="Filter kategori"></div>
+    <div class="grid" id="grid">
+      <div class="sk-row"><div class="sk a"></div><div class="b"><i class="sk"></i><i class="sk"></i></div></div>
+      <div class="sk-row"><div class="sk a"></div><div class="b"><i class="sk"></i><i class="sk"></i></div></div>
+      <div class="sk-row"><div class="sk a"></div><div class="b"><i class="sk"></i><i class="sk"></i></div></div>
+      <div class="sk-row"><div class="sk a"></div><div class="b"><i class="sk"></i><i class="sk"></i></div></div>
     </div>
-    <span class="meta" id="meta">Memuat…</span>
-    <div class="viewer"><div class="scroll" id="out"><div class="state">Memuat node.sh…</div></div></div>
   </section>
 
-  <div class="warn"><i aria-hidden="true">!</i><span>Selalu baca script sebelum menjalankannya, terutama dengan akses root.</span></div>
+  <section class="card info" id="info">
+    <div><div class="sk" style="height:16px;width:50%;margin-bottom:12px"></div><div class="sk" style="height:70px"></div></div>
+    <div><div class="sk" style="height:16px;width:50%;margin-bottom:12px"></div><div class="sk" style="height:70px"></div></div>
+    <div><div class="sk" style="height:16px;width:50%;margin-bottom:12px"></div><div class="sk" style="height:70px"></div></div>
+  </section>
+
+  <div class="warn"><i aria-hidden="true">!</i><span>Jalankan sebagai root di server panel. Script ini menghapus Nest bawaan, jadi pastikan itu memang yang kamu mau.</span></div>
 </main>
 
 <script>
 (function(){
-  var FILE = "node.sh";
-  var out = document.getElementById("out");
-  var meta = document.getElementById("meta");
-  var copyScript = document.getElementById("copyScript");
-  var download = document.getElementById("download");
-  var text = "";
+  var DOMAIN = "kruzzy.biz.id", FILE = "node.sh";
+  var CMD = "bash <(curl -s https://" + DOMAIN + "/" + FILE + ")";
 
-  function flash(btn, label){
-    var old = btn.textContent;
-    btn.textContent = label; btn.classList.add("done");
-    setTimeout(function(){ btn.textContent = old; btn.classList.remove("done"); }, 1400);
+  var STEPS = [
+    {t:"Location", tag:"Panel", s:"Membuat lokasi untuk node.", d:[
+      "Short code dan deskripsi ditanyakan (default: <code>SGP</code>).",
+      "Dilewati kalau short code sudah ada."]},
+    {t:"Node", tag:"Panel", s:"Mendaftarkan node ke panel.", d:[
+      "Butuh FQDN, nama node, RAM, dan disk (default 4000 MB).",
+      "Pakai https otomatis kalau sertifikat Let's Encrypt untuk domain itu ada, kalau tidak http.",
+      "Port daemon <code>8080</code>, SFTP <code>2022</code>, data di <code>/var/lib/pterodactyl/volumes</code>.",
+      "Dipakai ulang kalau FQDN sudah terdaftar."]},
+    {t:"Allocation", tag:"Panel", s:"Membuka port untuk server.", d:[
+      "IP <code>0.0.0.0</code>, port <code>2000-2300</code>, alias <code>KruzzyNotDev</code>.",
+      "Dilewati kalau node sudah punya allocation."]},
+    {t:"Hapus Nest bawaan", tag:"Hati-hati", s:"Membersihkan nest default panel.", d:[
+      "Menghapus Minecraft, Source Engine, Voice Servers, dan Rust.",
+      "Daftar bisa diubah lewat <code>NEST_DELETE</code>.",
+      "Kalau ada yang gagal, hanya muncul peringatan dan script lanjut."]},
+    {t:"Nest dan Egg", tag:"Panel", s:"Membuat nest sendiri dan mengimpor egg.", d:[
+      "Nest bernama <code>Kruzzy</code> (ubah lewat <code>NEST_NAME</code>).",
+      "Egg diunduh dari GitHub lalu diimpor otomatis.",
+      "Egg tambahan: taruh file <code>.json</code> di <code>/root/eggs/</code> sebelum menjalankan.",
+      "Egg yang sudah ada dilewati."]},
+    {t:"Config Wings", tag:"Wings", s:"Menulis config dan menyalakan Wings.", d:[
+      "Config dibuat otomatis di <code>/etc/pterodactyl/config.yml</code> dengan izin 600.",
+      "Service wings diaktifkan dan di-restart.",
+      "Kalau config tidak valid, script berhenti."]},
+    {t:"Server", tag:"Server", s:"Membuat server pertama.", d:[
+      "Nama <code>kruzzy</code>, egg <code>Node.js</code>, owner <code>admin@gmail.com</code>.",
+      "Ubah lewat <code>SERVER_NAME</code>, <code>SERVER_EGG</code>, <code>SERVER_OWNER</code>.",
+      "Resource tidak dibatasi (RAM, disk, CPU = 0).",
+      "Hanya jalan kalau Wings sudah aktif."]}
+  ];
+  var CATS = ["Semua","Panel","Wings","Server","Hati-hati"];
+
+  var statusEl = document.getElementById("status"), stxt = document.getElementById("stxt");
+  var grid = document.getElementById("grid"), chips = document.getElementById("chips");
+  var current = "Semua";
+
+  function flash(btn){
+    var old = btn.innerHTML;
+    btn.innerHTML = "<span>✓</span> Tersalin"; btn.classList.add("done");
+    setTimeout(function(){ btn.innerHTML = old; btn.classList.remove("done"); }, 1500);
   }
   function copy(str, btn){
-    function ok(){ flash(btn, "Tersalin"); }
-    function fallback(){
-      var t = document.createElement("textarea");
-      t.value = str; document.body.appendChild(t); t.select();
-      try { document.execCommand("copy"); ok(); } catch(e){}
+    function fb(){
+      var t = document.createElement("textarea"); t.value = str; document.body.appendChild(t); t.select();
+      try { document.execCommand("copy"); flash(btn); } catch(e){}
       document.body.removeChild(t);
     }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(str).then(ok, fallback);
-    } else { fallback(); }
+    if (navigator.clipboard && navigator.clipboard.writeText)
+      navigator.clipboard.writeText(str).then(function(){ flash(btn); }, fb);
+    else fb();
   }
   function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
-  function render(src){
-    var lines = src.replace(/\r\n/g,"\n").split("\n");
-    if (lines.length && lines[lines.length-1] === "") lines.pop();
-    var html = lines.map(function(l,i){
-      var cm = /^\s*#/.test(l) ? " cm" : "";
-      return '<div class="ln'+cm+'"><span>'+(i+1)+'</span><span>'+esc(l)+'</span></div>';
-    }).join("");
-    out.innerHTML = "<pre>"+html+"</pre>";
-    meta.textContent = FILE + " · " + lines.length + " baris · " + new Blob([src]).size + " byte";
+  function renderCmd(){
+    var w = document.getElementById("cmdWrap");
+    w.innerHTML = '<code>' + esc(CMD) + '</code><button type="button" id="copyCmd">Salin</button>';
+    document.getElementById("copyCmd").onclick = function(){ copy(CMD, this); };
   }
 
-  function fail(msg){
-    out.innerHTML = '<div class="state"><b>Gagal memuat.</b> ' + esc(msg) +
-      '<br><br>Pastikan file <code>' + FILE + '</code> ada di folder yang sama dengan <code>index.html</code>.</div>';
-    meta.textContent = "Tidak ada data";
-    copyScript.disabled = download.disabled = true;
+  function renderChips(){
+    chips.innerHTML = "";
+    CATS.forEach(function(c){
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "chip"; b.textContent = c;
+      b.setAttribute("aria-pressed", c === current);
+      b.onclick = function(){ current = c; renderChips(); renderSteps(false); };
+      chips.appendChild(b);
+    });
   }
 
-  function load(){
-    meta.textContent = "Memuat…";
-    out.innerHTML = '<div class="state">Memuat ' + FILE + '…</div>';
-    fetch(FILE + "?t=" + Date.now(), {cache:"no-store"}).then(function(r){
-      if (!r.ok) throw new Error("Server membalas " + r.status + ".");
-      return r.text();
-    }).then(function(src){
-      var head = src.trim().slice(0,15).toLowerCase();
-      if (head.indexOf("<!doctype") === 0 || head.indexOf("<html") === 0)
-        throw new Error("File yang diterima berupa halaman HTML, bukan script.");
-      if (!src.trim()) throw new Error("File kosong.");
-      text = src; render(src);
-      copyScript.disabled = download.disabled = false;
-    }).catch(function(e){ fail(e.message || "Terjadi kesalahan."); });
+  function renderSteps(animate){
+    grid.innerHTML = "";
+    STEPS.forEach(function(s, i){
+      if (current !== "Semua" && s.tag !== current) return;
+      var el = document.createElement("details");
+      el.className = "step card-step" + (animate ? " in" : "");
+      if (animate) el.style.animationDelay = (i * 70) + "ms";
+      el.innerHTML = '<summary><span class="num">' + (i+1) + '</span>' +
+        '<span class="txt"><b>' + s.t + '</b><small>' + s.s + '</small></span>' +
+        '<span class="tag ' + s.tag + '">' + s.tag + '</span><span class="chev"></span></summary>' +
+        '<div class="body"><ul>' + s.d.map(function(x){ return "<li>" + x + "</li>"; }).join("") + '</ul></div>';
+      grid.appendChild(el);
+    });
   }
 
-  document.getElementById("copyCmd").onclick = function(){
-    copy(document.getElementById("cmd").textContent, this);
-  };
-  copyScript.onclick = function(){ copy(text, this); };
-  download.onclick = function(){
-    var a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([text],{type:"text/x-shellscript"}));
-    a.download = FILE; document.body.appendChild(a); a.click(); a.remove();
-  };
-  document.getElementById("reload").onclick = load;
-  load();
+  function renderInfo(){
+    document.getElementById("info").innerHTML =
+      '<div><h3>Kebutuhan</h3><ul><li>Panel Pterodactyl di <code>/var/www/pterodactyl</code></li><li>PHP terpasang</li><li>Wings terpasang</li><li>Akses root</li></ul></div>' +
+      '<div><h3>Yang ditanyakan</h3><div class="tags"><span>Short code</span><span>Deskripsi location</span><span>FQDN node</span><span>Nama node</span><span>RAM (MB)</span><span>Disk (MB)</span><span>Jumlah allocation</span></div></div>' +
+      '<div><h3>Opsi lewat env</h3><div class="tags"><span>NEST_NAME</span><span>NEST_DESC</span><span>NEST_DELETE</span><span>SERVER_NAME</span><span>SERVER_EGG</span><span>SERVER_OWNER</span></div></div>';
+  }
+
+  function setStatus(ok){
+    statusEl.className = "status " + (ok ? "ok" : "bad");
+    stxt.textContent = ok ? "Script tersedia" : "Script belum terdeteksi";
+  }
+
+  function check(){
+    return fetch(FILE, {method:"HEAD", cache:"no-store"})
+      .then(function(r){ return r.ok; }, function(){ return false; });
+  }
+
+  var minWait = new Promise(function(r){ setTimeout(r, 900); });
+  Promise.all([check(), minWait]).then(function(res){
+    setStatus(res[0]);
+    renderCmd(); renderChips(); renderSteps(true); renderInfo();
+  });
 })();
 </script>
 </body>
