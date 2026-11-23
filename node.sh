@@ -5,6 +5,20 @@ PANEL_DIR="/var/www/pterodactyl"
 WINGS_CONFIG="/etc/pterodactyl/config.yml"
 ART="php -d display_errors=0 $PANEL_DIR/artisan"
 
+# Konfigurasi PIN (bisa lewat env: PIN_CODE="123456" atau argumen: bash node.sh 123456)
+REQUIRED_PIN="${REQUIRED_PIN:-202611}"
+PIN_INPUT="${PIN_CODE:-${1:-}}"
+
+if [[ -z "$PIN_INPUT" ]] && [[ -t 0 ]]; then
+  read -r -s -p "Masukkan PIN akses script: " PIN_INPUT || true
+  echo ""
+fi
+
+if [[ "${PIN_INPUT:-}" != "$REQUIRED_PIN" ]]; then
+  echo "ERROR: PIN salah atau belum dimasukkan. Akses ditolak." >&2
+  exit 1
+fi
+
 # Nest & Egg (bisa diubah lewat env: NEST_NAME="Nama" NEST_DESC="Deskripsi")
 NEST_NAME="${NEST_NAME:-Kruzzy}"
 NEST_DESC="${NEST_DESC:-Support @KruzzyX Terus Bang🙏}"
