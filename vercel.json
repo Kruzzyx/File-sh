@@ -1,5 +1,0 @@
-{
-  "rewrites": [
-    { "source": "/node.sh", "destination": "/api/node" }
-  ]
-}
