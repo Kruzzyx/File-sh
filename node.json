@@ -1,0 +1,55 @@
+{
+  "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
+  "meta": {
+    "version": "PTDL_v2",
+    "update_url": null
+  },
+  "exported_at": "2025-06-23T19:26:16+02:00",
+  "name": "Node.js",
+  "author": "support@red-shadows-rs.com",
+  "description": "Node.js Egg for Pterodactyl. Pre-configured, secure, and ready-to-use for Node.js applications.\n\nTeam: RED SHADOWS | RS\nEmail: support@red-shadows-rs.com",
+  "features": null,
+  "docker_images": {
+    "Node.js 24": "ghcr.io/red-shadows-rs/pterodactyl-containers/nodejs:v24",
+    "Node.js 22": "ghcr.io/red-shadows-rs/pterodactyl-containers/nodejs:v22",
+    "Node.js 20": "ghcr.io/red-shadows-rs/pterodactyl-containers/nodejs:v20",
+    "Node.js 18": "ghcr.io/red-shadows-rs/pterodactyl-containers/nodejs:v18"
+  },
+  "file_denylist": [],
+  "startup": "if [ ! -f /home/container/{{STARTUP_FILE}} ]; then echo 'Error: {{STARTUP_FILE}} not found!'; exit 1; fi; npm install; if [[ \"{{STARTUP_FILE}}\" == *.ts ]]; then ts-node /home/container/{{STARTUP_FILE}}; else node /home/container/{{STARTUP_FILE}}; fi",
+  "config": {
+    "files": "{}",
+    "startup": "{\n    \"done\": \"\"\n}",
+    "logs": "{}",
+    "stop": "^^C"
+  },
+  "scripts": {
+    "installation": {
+      "script": "#!/bin/bash\r\n# NodeJS App Installation Script\r\n#\r\n# Server Files: /mnt/server\r\nexport DEBIAN_FRONTEND=noninteractive\r\napt update\r\napt install -y curl unzip\r\n\r\necho -e \"Updating NPM...\"\r\nnpm install npm@latest -g\r\n\r\necho -e \"Installing TypeScript & ts-node...\"\r\nnpm install -g typescript ts-node @types/node\r\n\r\nmkdir -p /mnt/server\r\ncd /mnt/server\r\n\r\necho \"Installing Nodejs Packages\"\r\nif [[ -z ${NODE_PACKAGES} ]]; then\r\n    npm install\r\nelse\r\n    npm install ${NODE_PACKAGES}\r\nfi\r\n\r\necho -e \"Install Complete\"\r\nexit 0",
+      "container": "ghcr.io/red-shadows-rs/pterodactyl-containers/nodejs:v22",
+      "entrypoint": "bash"
+    }
+  },
+  "variables": [
+    {
+      "name": "Startup File",
+      "description": "The main file to start the server (e.g. index.js).",
+      "env_variable": "STARTUP_FILE",
+      "default_value": "index.js",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string",
+      "field_type": "text"
+    },
+    {
+      "name": "Node Packages",
+      "description": "Additional Node.js packages to install (space-separated).",
+      "env_variable": "NODE_PACKAGES",
+      "default_value": "",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "nullable|string",
+      "field_type": "text"
+    }
+  ]
+}
