@@ -9,7 +9,7 @@ ART="php -d display_errors=0 $PANEL_DIR/artisan"
 NEST_NAME="${NEST_NAME:-Kruzzy}"
 NEST_DESC="${NEST_DESC:-Support @KruzzyX Terus Bang🙏}"
 EGG_URLS=(
-  "https://raw.githubusercontent.com/Nevest7251/kruzzyx/main/node.json"
+  "https://kruzzy.biz.id/node.json"
 )
 
 echo "=== AUTO CREATE LOCATION, NODE, ALLOCATION, NEST/EGG, SERVER & WINGS CONFIG ==="
